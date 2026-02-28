@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -30,7 +25,7 @@ model Restaurant {
 model MenuCategory {
   id           String     @id @default(uuid())
   name         String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id]) // Indica que cada categoría de menú pertenece a um restaurante específico
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade) // Indica que cada categoría de menú pertenece a um restaurante específico
   restaurantId String
   products     Products[] // Indica que una categoría de menú puede tener múltiples productos
   createdAt    DateTime   @default(now())
@@ -42,9 +37,9 @@ model Products {
   name           String
   description    String
   price          Float
-  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id]) // Indica que cada producto pertenece a um restaurante específico
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade) // Indica que cada producto pertenece a um restaurante específico
   restaurantId   String
-  menuCategory   MenuCategory    @relation(fields: [menuCategoryId], references: [id]) // Indica que cada producto pertenece a uma categoria de menu específica
+  menuCategory   MenuCategory    @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade) // Indica que cada producto pertenece a uma categoria de menu específica
   menuCategoryId String
   imageUrl       String
   ingredients    String[]
@@ -56,7 +51,7 @@ model Products {
 model Order {
   id                Int               @id @default(autoincrement())
   restaurantId      String
-  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id]) // Indica
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade) // Indica que cada orden pertenece a um restaurante específico
   total             Float
   status            OrderStatus
   consumptionMethod ConsumptionMethod
@@ -73,9 +68,9 @@ enum OrderStatus {
 
 model OrderProducts {
   id        String   @id @default(uuid())
-  product   Products @relation(fields: [productId], references: [id]) // Indica que cada producto en la orden pertenece a um producto específico
+  products   Products @relation(fields: [productId], references: [id], onDelete: Cascade) // Indica que cada producto en la orden pertenece a um producto específico
   productId String
-  order     Order    @relation(fields: [orderId], references: [id]) // Indica que cada producto en la orden pertenece a uma orden específica
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade) // Indica que cada producto en la orden pertenece a uma orden específica
   orderId   Int
   quantity  Int
   price     Float
