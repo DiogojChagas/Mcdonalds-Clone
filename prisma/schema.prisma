@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id             String         @id @default(uuid())
+  name           String
+  slug           String
+  description    String
+  avatarImageUrl String
+  orders         Order[] // Indica que un restaurante puede tener múltiples órdenes
+  coverImageUrl  String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  products       Products[] // Indica que un restaurante pode ter multiplos productos
+  menuCategories MenuCategory[] // Indica que un restaurante pode ter multiplas categorias de menu
+}
+
+model MenuCategory {
+  id           String     @id @default(uuid())
+  name         String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id]) // Indica que cada categoría de menú pertenece a um restaurante específico
+  restaurantId String
+  products     Products[] // Indica que una categoría de menú puede tener múltiples productos
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Products {
+  id             String          @id @default(uuid())
+  name           String
+  description    String
+  price          Float
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id]) // Indica que cada producto pertenece a um restaurante específico
+  restaurantId   String
+  menuCategory   MenuCategory    @relation(fields: [menuCategoryId], references: [id]) // Indica que cada producto pertenece a uma categoria de menu específica
+  menuCategoryId String
+  imageUrl       String
+  ingredients    String[]
+  orderProducts  OrderProducts[] // Indica que un producto puede estar en múltiples órdenes
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Order {
+  id                Int               @id @default(autoincrement())
+  restaurantId      String
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id]) // Indica
+  total             Float
+  status            OrderStatus
+  consumptionMethod ConsumptionMethod
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  orderProducts     OrderProducts[] // Indica que una orden puede tener múltiples productos
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PREPARATION
+  COMPLETED
+}
+
+model OrderProducts {
+  id        String   @id @default(uuid())
+  product   Products @relation(fields: [productId], references: [id]) // Indica que cada producto en la orden pertenece a um producto específico
+  productId String
+  order     Order    @relation(fields: [orderId], references: [id]) // Indica que cada producto en la orden pertenece a uma orden específica
+  orderId   Int
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ConsumptionMethod {
+  DINE_IN
+  TAKEAWAY
+}
