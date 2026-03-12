@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,7 +10,7 @@ datasource db {
 model Restaurant {
   id             String         @id @default(uuid())
   name           String
-  slug           String
+  slug           String         @unique
   description    String
   avatarImageUrl String
   orders         Order[] // Indica que un restaurante puede tener múltiples órdenes
@@ -68,7 +67,7 @@ enum OrderStatus {
 
 model OrderProducts {
   id        String   @id @default(uuid())
-  products   Products @relation(fields: [productId], references: [id], onDelete: Cascade) // Indica que cada producto en la orden pertenece a um producto específico
+  products  Products @relation(fields: [productId], references: [id], onDelete: Cascade) // Indica que cada producto en la orden pertenece a um producto específico
   productId String
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade) // Indica que cada producto en la orden pertenece a uma orden específica
   orderId   Int
